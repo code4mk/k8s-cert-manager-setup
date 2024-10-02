@@ -9,37 +9,19 @@ print_green_bg() {
   echo -e "${GREEN_BG}$1${RESET_COLOR}"
 }
 
-# Function to install Nginx Ingress
-install_nginx_ingress() {
-  local name=$1
-  local namespace=$2
-  local ingress_class=$3
+# Add the Ingress NGINX Helm repository
+print_green_bg "Adding Ingress NGINX Helm repository..."
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
-  print_green_bg "Installing Nginx Ingress Controller: $name in namespace: $namespace with ingress class: $ingress_class"
+# Update Helm repositories
+print_green_bg "Updating Helm repositories..."
+helm repo update
 
-  # Check if namespace exists, create if necessary
-  if ! kubectl get namespace "$namespace" &> /dev/null; then
-    print_green_bg "Namespace $namespace does not exist, creating..."
-    kubectl create namespace "$namespace"
-  else
-    print_green_bg "Namespace $namespace already exists."
-  fi
+# Install Ingress NGINX
+print_green_bg "Installing Ingress NGINX..."
+helm install nginx-ingress ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace \
+  --set controller.publishService.enabled=true
 
-  # Install Nginx Ingress using Helm
-  helm install "$name" ingress-nginx/ingress-nginx \
-    --namespace "$namespace" \
-    --set controller.service.type=LoadBalancer \
-    --set controller.ingressClassResource.name="$ingress_class" \
-    --set controller.ingressClassResource.controllerValue="$ingress_class-controller"
-}
-
-# Prompt for nginx Ingress controller service name
-read -p "Enter the service name for the nginx ingress: " SERVICE_NAME
-PREFIX="dockman"
-NGINX_INGRESS_NAMESPACE="${PREFIX}-ingress"
-NGINX_INGRESS_CLASS="${PREFIX}-${SERVICE_NAME}-nginx"
-
-# Install the Nginx Ingress controller
-install_nginx_ingress "$SERVICE_NAME" "$NGINX_INGRESS_NAMESPACE" "$NGINX_INGRESS_CLASS"
-
-print_green_bg "Nginx Ingress Controller installation complete."
+print_green_bg "Ingress NGINX installation completed."
