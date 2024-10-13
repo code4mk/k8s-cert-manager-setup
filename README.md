@@ -38,7 +38,7 @@ This script installs and configures Cert-Manager on your Kubernetes cluster.
 
 1. Clone this repository:
    ```
-   git clone https://github.com/your-username/k8s-cert-manager-setup.git
+   git clone https://github.com/code4mk/k8s-cert-manager-setup.git
    cd k8s-cert-manager-setup
    ```
 
